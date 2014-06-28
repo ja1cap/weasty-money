@@ -16,32 +16,32 @@ class CurrencyRate extends AbstractEntity
     /**
      * @var integer
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      */
-    private $sourceAlphabeticCode;
+    protected $sourceAlphabeticCode;
 
     /**
      * @var integer
      */
-    private $sourceNumericCode;
+    protected $sourceNumericCode;
 
     /**
      * @var string
      */
-    private $destinationAlphabeticCode;
+    protected $destinationAlphabeticCode;
 
     /**
      * @var integer
      */
-    private $destinationNumericCode;
+    protected $destinationNumericCode;
 
     /**
      * @var float
      */
-    private $rate;
+    protected $rate;
 
 
     /**
