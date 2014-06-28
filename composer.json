@@ -1,0 +1,19 @@
+{
+    "name": "weasty/money",
+    "type": "library",
+    "description": "Weasty money",
+    "license": "MIT",
+    "authors": [
+        {"name": "ja1cap", "email": "ja1cap@me.com"}
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "doctrine/orm": "~2.2,>=2.2.3",
+        "twig/twig": "~1.12",
+        "weasty/resource": "dev-master",
+        "weasty/doctrine": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Weasty\\Resource\\": "lib/" }
+    }
+}
