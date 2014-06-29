@@ -8,6 +8,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
+        "symfony/intl": "~2",
         "doctrine/orm": "~2.2,>=2.2.3",
         "twig/twig": "~1.12",
         "weasty/resource": "dev-master",

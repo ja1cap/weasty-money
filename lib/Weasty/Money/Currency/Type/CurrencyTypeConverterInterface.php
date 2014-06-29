@@ -1,11 +1,11 @@
 <?php
-namespace Weasty\Money\Converter\CurrencyCodeType;
+namespace Weasty\Money\Currency\Type;
 
 /**
- * Interface CurrencyTypeCodeConverterInterface
- * @package Weasty\Money\Converter\CurrencyCodeType
+ * Interface CurrencyTypeConverterInterface
+ * @package Weasty\Money\Currency\Type
  */
-interface CurrencyTypeCodeConverterInterface {
+interface CurrencyTypeConverterInterface {
 
     /**
      * Currency type unique identifier
@@ -30,6 +30,6 @@ interface CurrencyTypeCodeConverterInterface {
      * @param string $currencyAlphabeticCode The 3-letter ISO 4217 currency code
      * @return mixed
      */
-    function getTypeCurrencyCode($currencyAlphabeticCode);
+    function getCurrencyCode($currencyAlphabeticCode);
 
 } 

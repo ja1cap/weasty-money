@@ -1,14 +1,15 @@
 <?php
-namespace Weasty\Money\Converter;
+namespace Weasty\Money\Currency\Converter;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 use Weasty\Money\Currency\Rate\CurrencyRateInterface;
 use Weasty\Money\Currency\CurrencyResource;
 use Weasty\Money\Price\PriceInterface;
 
 /**
  * Class CurrencyConverter
- * @package Weasty\Money\Converter
+ * @package Weasty\Money\Currency\Converter
  */
 class CurrencyConverter implements CurrencyConverterInterface {
 
@@ -18,7 +19,7 @@ class CurrencyConverter implements CurrencyConverterInterface {
     protected $currencyRateRepository;
 
     /**
-     * @var \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @var \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     protected $currencyCodeConverter;
 
@@ -108,7 +109,7 @@ class CurrencyConverter implements CurrencyConverterInterface {
     }
 
     /**
-     * @return \Weasty\Money\Data\\Weasty\Money\Currency\CurrencyResource
+     * @return \Weasty\Money\Currency\CurrencyResource
      */
     public function getCurrencyResource()
     {
@@ -116,7 +117,7 @@ class CurrencyConverter implements CurrencyConverterInterface {
     }
 
     /**
-     * @return \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @return \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     public function getCurrencyCodeConverter()
     {

@@ -4,8 +4,8 @@ namespace Weasty\Money\Twig;
 use Symfony\Component\Intl\Intl;
 use Weasty\Money\Currency\CurrencyResource;
 use Weasty\Money\Price\PriceInterface;
-use Weasty\Money\Converter\CurrencyCodeConverterInterface;
-use Weasty\Money\Converter\CurrencyConverterInterface;
+use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
+use Weasty\Money\Currency\Converter\CurrencyConverterInterface;
 
 /**
  * Class AbstractMoneyExtension
@@ -19,19 +19,19 @@ abstract class AbstractMoneyExtension extends \Twig_Extension {
     protected $currencyResource;
 
     /**
-     * @var \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @var \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     protected $currencyCodeConverter;
 
     /**
-     * @var \Weasty\Money\Converter\CurrencyConverterInterface
+     * @var \Weasty\Money\Currency\Converter\CurrencyConverterInterface
      */
     protected $currencyConverter;
 
     /**
      * @param CurrencyResource $currencyResource
-     * @param CurrencyCodeConverterInterface $currencyCodeConverter
-     * @param CurrencyConverterInterface $currencyConverter
+     * @param \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface $currencyCodeConverter
+     * @param \Weasty\Money\Currency\Converter\CurrencyConverterInterface $currencyConverter
      */
     function __construct(CurrencyResource $currencyResource, CurrencyCodeConverterInterface $currencyCodeConverter, CurrencyConverterInterface $currencyConverter)
     {
@@ -136,7 +136,7 @@ abstract class AbstractMoneyExtension extends \Twig_Extension {
     }
 
     /**
-     * @return \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @return \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     public function getCurrencyCodeConverter()
     {
@@ -144,7 +144,7 @@ abstract class AbstractMoneyExtension extends \Twig_Extension {
     }
 
     /**
-     * @return \Weasty\Money\Converter\CurrencyConverterInterface
+     * @return \Weasty\Money\Currency\Converter\CurrencyConverterInterface
      */
     public function getCurrencyConverter()
     {

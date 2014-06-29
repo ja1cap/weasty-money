@@ -1,13 +1,13 @@
 <?php
-namespace Weasty\Money\Converter;
-use Weasty\Bundle\MoneyBundle\Converter\CurrencyCodeType;
+namespace Weasty\Money\Currency\Type;
+
 use Weasty\Money\Currency\CurrencyResource;
 
 /**
- * Class CurrencyTypeCodeConverterFactory
- * @package Weasty\Money\Converter
+ * Class CurrencyTypeConverterFactory
+ * @package Weasty\Money\Currency\Type
  */
-class CurrencyTypeCodeConverterFactory {
+class CurrencyTypeConverterFactory {
 
     /**
      * @var \Weasty\Money\Currency\CurrencyResource
@@ -26,7 +26,7 @@ class CurrencyTypeCodeConverterFactory {
 
     /**
      * @param \Weasty\Money\Currency\CurrencyResource $currencyResource
-     * @param $converterClassNames
+     * @param $converterClassNames[":type"=>":converterClassName"]
      */
     function __construct(CurrencyResource $currencyResource, $converterClassNames)
     {
@@ -63,7 +63,7 @@ class CurrencyTypeCodeConverterFactory {
 
     /**
      * @param $type
-     * @return \Weasty\Money\Converter\CurrencyCodeType\CurrencyTypeCodeConverterInterface
+     * @return \Weasty\Money\Currency\Type\CurrencyTypeConverterInterface
      * @throws \Exception
      */
     public function createConverter($type){
@@ -84,7 +84,7 @@ class CurrencyTypeCodeConverterFactory {
         if($reflection->implementsInterface($interfaceName)){
 
             /**
-             * @var $converter \Weasty\Money\Converter\CurrencyCodeType\CurrencyTypeCodeConverterInterface
+             * @var $converter \Weasty\Money\Currency\Type\CurrencyTypeConverterInterface
              */
             $converter = $reflection->newInstance($this->getCurrencyResource());
 

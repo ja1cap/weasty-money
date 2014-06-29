@@ -1,7 +1,7 @@
 <?php
 namespace Weasty\Money\Twig;
 
-use Weasty\Money\Converter\CurrencyCodeConverterInterface;
+use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 use Weasty\Money\Currency\CurrencyResource;
 
 /**
@@ -16,13 +16,13 @@ class CurrencyExtension extends \Twig_Extension {
     protected $currencyResource;
 
     /**
-     * @var \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @var \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     protected $currencyCodeConverter;
 
     /**
      * @param \Weasty\Money\Currency\CurrencyResource $currencyResource
-     * @param \Weasty\Money\Converter\CurrencyCodeConverterInterface $currencyCodeConverter
+     * @param \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface $currencyCodeConverter
      */
     function __construct(CurrencyResource $currencyResource, CurrencyCodeConverterInterface $currencyCodeConverter)
     {
@@ -99,7 +99,7 @@ class CurrencyExtension extends \Twig_Extension {
     }
 
     /**
-     * @return \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @return \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     public function getCurrencyCodeConverter()
     {

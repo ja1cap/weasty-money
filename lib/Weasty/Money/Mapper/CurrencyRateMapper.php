@@ -3,7 +3,7 @@ namespace Weasty\Money\Mapper;
 
 use Weasty\Money\Currency\CurrencyResource;
 use Weasty\Money\Entity\CurrencyRate;
-use Weasty\Money\Converter\CurrencyCodeConverterInterface;
+use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 
 /**
  * Class CurrencyRateMapper
@@ -17,13 +17,13 @@ class CurrencyRateMapper {
     protected $currencyRate;
 
     /**
-     * @var \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @var \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     protected $currencyCodeConverter;
 
     /**
      * @param CurrencyRate $currencyRate
-     * @param \Weasty\Money\Converter\CurrencyCodeConverterInterface $currencyCodeConverter
+     * @param \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface $currencyCodeConverter
      */
     function __construct(CurrencyRate $currencyRate, CurrencyCodeConverterInterface $currencyCodeConverter)
     {
@@ -102,7 +102,7 @@ class CurrencyRateMapper {
     }
 
     /**
-     * @return \Weasty\Money\Converter\CurrencyCodeConverterInterface
+     * @return \Weasty\Money\Currency\Code\CurrencyCodeConverterInterface
      */
     public function getCurrencyCodeConverter()
     {

@@ -1,13 +1,13 @@
 <?php
-namespace Weasty\Money\Converter\CurrencyCodeType;
+namespace Weasty\Money\Currency\Type;
 
 use Weasty\Money\Currency\CurrencyResource;
 
 /**
- * Class CurrencyTypeIso4217AlphabeticCodeConverter
- * @package Weasty\Money\Converter\CurrencyCodeType
+ * Class CurrencyIso4217AlphaConverter
+ * @package Weasty\Money\Currency\Type
  */
-class CurrencyTypeIso4217AlphabeticCodeConverter implements CurrencyTypeCodeConverterInterface {
+class CurrencyIso4217AlphaConverter implements CurrencyTypeConverterInterface {
 
     function __construct()
     {
@@ -45,7 +45,7 @@ class CurrencyTypeIso4217AlphabeticCodeConverter implements CurrencyTypeCodeConv
      * @param string $currencyAlphabeticCode The 3-letter ISO 4217 currency code
      * @return mixed
      */
-    function getTypeCurrencyCode($currencyAlphabeticCode)
+    function getCurrencyCode($currencyAlphabeticCode)
     {
         return $currencyAlphabeticCode;
     }
