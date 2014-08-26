@@ -87,7 +87,8 @@ class Price implements \ArrayAccess, PriceInterface {
      */
     public function offsetExists($offset)
     {
-        return in_array($offset, array('value', 'currency'));
+        $method = 'get' . str_replace(" ", "", ucwords(strtr($offset, "_-", "  ")));
+        return method_exists($this, $method);
     }
 
     /**
@@ -101,16 +102,11 @@ class Price implements \ArrayAccess, PriceInterface {
      */
     public function offsetGet($offset)
     {
-        switch($offset){
-            case 'value':
-                return $this->getValue();
-                break;
-            case 'currency':
-                return $this->getCurrency();
-                break;
-            default:
-                return null;
+        $method = 'get' . str_replace(" ", "", ucwords(strtr($offset, "_-", "  ")));
+        if(method_exists($this, $method)){
+            return $this->$method();
         }
+        return null;
     }
 
     /**
@@ -127,13 +123,9 @@ class Price implements \ArrayAccess, PriceInterface {
      */
     public function offsetSet($offset, $value)
     {
-        switch($offset){
-            case 'value':
-                $this->setValue($value);
-                break;
-            case 'currency':
-                $this->setCurrency($value);
-                break;
+        $method = 'set' . str_replace(" ", "", ucwords(strtr($offset, "_-", "  ")));
+        if(method_exists($this, $method)){
+            $this->$method($value);
         }
     }
 
@@ -148,13 +140,9 @@ class Price implements \ArrayAccess, PriceInterface {
      */
     public function offsetUnset($offset)
     {
-        switch($offset){
-            case 'value':
-                $this->setValue(null);
-                break;
-            case 'currency':
-                $this->setCurrency(null);
-                break;
+        $method = 'set' . str_replace(" ", "", ucwords(strtr($offset, "_-", "  ")));
+        if(method_exists($this, $method)){
+            $this->$method(null);
         }
     }
 
