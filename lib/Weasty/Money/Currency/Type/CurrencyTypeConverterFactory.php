@@ -76,7 +76,7 @@ class CurrencyTypeConverterFactory {
             throw new \Exception(sprintf('Converter with type %s not found', $type));
         }
 
-        $interfaceName = 'Weasty\Money\Converter\CurrencyCodeType\CurrencyTypeCodeConverterInterface';
+        $interfaceName = 'Weasty\Money\Currency\Type\CurrencyTypeConverterInterface';
         $className = $this->converterClassNames[$type];
         $reflection = new \ReflectionClass($className);
 
