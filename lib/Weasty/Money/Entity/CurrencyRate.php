@@ -55,6 +55,13 @@ class CurrencyRate extends AbstractEntity
     }
 
     /**
+     * @return string
+     */
+    public function getName(){
+        return ($this->getSourceAlphabeticCode().'/'.$this->getDestinationAlphabeticCode());
+    }
+
+    /**
      * Set sourceAlphabeticCode
      *
      * @param string $sourceAlphabeticCode
