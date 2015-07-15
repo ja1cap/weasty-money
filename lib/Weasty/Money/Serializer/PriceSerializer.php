@@ -22,6 +22,17 @@ class PriceSerializer implements PriceSerializerInterface
   protected $moneyFormatter;
 
   /**
+   * PriceSerializer constructor.
+   *
+   * @param MoneyFormatterInterface $moneyFormatter
+   * @param CurrencyFormatterInterface $currencyFormatter
+   */
+  public function __construct( MoneyFormatterInterface $moneyFormatter, CurrencyFormatterInterface $currencyFormatter ) {
+    $this->moneyFormatter    = $moneyFormatter;
+    $this->currencyFormatter = $currencyFormatter;
+  }
+
+  /**
    * @param PriceInterface $price
    *
    * @return array
