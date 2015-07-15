@@ -1,12 +1,7 @@
 <?php
 namespace Weasty\Money\Twig;
 
-use Symfony\Component\Intl\Intl;
-use Weasty\Money\Currency\CurrencyResource;
-use Weasty\Money\Price\Formatter\PriceFormatterInterface;
-use Weasty\Money\Price\PriceInterface;
-use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
-use Weasty\Money\Currency\Converter\CurrencyConverterInterface;
+use Weasty\Money\Formatter\Money\MoneyFormatterInterface;
 
 /**
  * Class AbstractMoneyExtension
@@ -15,21 +10,21 @@ use Weasty\Money\Currency\Converter\CurrencyConverterInterface;
 abstract class AbstractMoneyExtension extends \Twig_Extension {
 
     /**
-     * @var PriceFormatterInterface
+     * @var MoneyFormatterInterface
      */
     protected $priceFormatter;
 
     /**
      * AbstractMoneyExtension constructor.
      *
-     * @param PriceFormatterInterface $priceFormatter
+     * @param MoneyFormatterInterface $priceFormatter
      */
-    public function __construct( PriceFormatterInterface $priceFormatter ) {
+    public function __construct( MoneyFormatterInterface $priceFormatter ) {
         $this->priceFormatter = $priceFormatter;
     }
 
     /**
-     * @return PriceFormatterInterface
+     * @return \Weasty\Money\Formatter\MoneyFormatterInterface
      */
     public function getPriceFormatter() {
         return $this->priceFormatter;

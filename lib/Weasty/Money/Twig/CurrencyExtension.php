@@ -1,7 +1,7 @@
 <?php
 namespace Weasty\Money\Twig;
 
-use Weasty\Money\Currency\Formatter\CurrencyFormatterInterface;
+use Weasty\Money\Formatter\Currency\CurrencyFormatterInterface;
 
 /**
  * Class CurrencyExtension
@@ -10,7 +10,7 @@ use Weasty\Money\Currency\Formatter\CurrencyFormatterInterface;
 class CurrencyExtension extends \Twig_Extension {
 
     /**
-     * @var CurrencyFormatterInterface
+     * @var \Weasty\Money\Formatter\Currency\CurrencyFormatterInterface
      */
     protected $currencyFormatter;
 

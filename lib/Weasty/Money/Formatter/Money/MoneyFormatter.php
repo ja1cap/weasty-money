@@ -1,5 +1,5 @@
 <?php
-namespace Weasty\Money\Price\Formatter;
+namespace Weasty\Money\Formatter\Money;
 use Symfony\Component\Intl\Intl;
 use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 use Weasty\Money\Currency\Converter\CurrencyConverterInterface;
@@ -7,10 +7,10 @@ use Weasty\Money\Currency\CurrencyResource;
 use Weasty\Money\Price\PriceInterface;
 
 /**
- * Class PriceFormatter
- * @package Weasty\Money\Price\Formatter
+ * Class MoneyFormatter
+ * @package Weasty\Money\Formatter
  */
-class PriceFormatter implements PriceFormatterInterface {
+class MoneyFormatter implements MoneyFormatterInterface {
 
   /**
    * @var CurrencyResource

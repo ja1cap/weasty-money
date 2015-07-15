@@ -1,5 +1,5 @@
 <?php
-namespace Weasty\Money\Currency\Formatter;
+namespace Weasty\Money\Formatter\Currency;
 
 use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 use Weasty\Money\Currency\CurrencyInterface;

@@ -1,11 +1,11 @@
 <?php
-namespace Weasty\Money\Price\Formatter;
+namespace Weasty\Money\Formatter\Money;
 
 /**
- * Interface PriceFormatterInterface
- * @package Weasty\Money\Price\Formatter
+ * Interface MoneyFormatterInterface
+ * @package Weasty\Money\Formatter
  */
-interface PriceFormatterInterface {
+interface MoneyFormatterInterface {
 
   /**
    * @param string|null|\Weasty\Money\Price\PriceInterface $value
