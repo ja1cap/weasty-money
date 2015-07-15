@@ -12,22 +12,22 @@ abstract class AbstractMoneyExtension extends \Twig_Extension {
     /**
      * @var MoneyFormatterInterface
      */
-    protected $priceFormatter;
+    protected $moneyFormatter;
 
     /**
      * AbstractMoneyExtension constructor.
      *
-     * @param MoneyFormatterInterface $priceFormatter
+     * @param MoneyFormatterInterface $moneyFormatter
      */
-    public function __construct( MoneyFormatterInterface $priceFormatter ) {
-        $this->priceFormatter = $priceFormatter;
+    public function __construct( MoneyFormatterInterface $moneyFormatter ) {
+        $this->moneyFormatter = $moneyFormatter;
     }
 
     /**
-     * @return \Weasty\Money\Formatter\MoneyFormatterInterface
+     * @return \Weasty\Money\Formatter\Money\MoneyFormatterInterface
      */
-    public function getPriceFormatter() {
-        return $this->priceFormatter;
+    public function getMoneyFormatter() {
+        return $this->moneyFormatter;
     }
 
 }
