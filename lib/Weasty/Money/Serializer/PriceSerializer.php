@@ -44,7 +44,7 @@ class PriceSerializer implements PriceSerializerInterface
     $currency = $price->getCurrency();
 
     $moneyFormat = $this->moneyFormatter->formatMoney( $value, $currency );
-    $priceFormat = $this->moneyFormatter->formatPrice( $currency, $currency );
+    $priceFormat = $this->moneyFormatter->formatPrice( $value, $currency );
 
     $currencyName = $this->currencyFormatter->formatName( $currency );
     $currencySymbol = $this->currencyFormatter->formatSymbol( $currency );
