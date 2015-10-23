@@ -32,6 +32,21 @@ class Currency
     protected $alphabeticCode;
 
     /**
+     * @var int
+     */
+    protected $decimalDigits;
+
+    /**
+     * @var string
+     */
+    protected $decimalPoint;
+
+    /**
+     * @var string
+     */
+    protected $thousandsSeparator;
+
+    /**
      * @param array $data
      */
     function __construct(array $data = array())
@@ -103,6 +118,48 @@ class Currency
     public function setSymbol($symbol)
     {
         $this->symbol = $symbol;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDecimalDigits() {
+        return $this->decimalDigits;
+    }
+
+    /**
+     * @param int $decimalDigits
+     */
+    public function setDecimalDigits( $decimalDigits ) {
+        $this->decimalDigits = $decimalDigits;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDecimalPoint() {
+        return $this->decimalPoint;
+    }
+
+    /**
+     * @param string $decimalPoint
+     */
+    public function setDecimalPoint( $decimalPoint ) {
+        $this->decimalPoint = $decimalPoint;
+    }
+
+    /**
+     * @return string
+     */
+    public function getThousandsSeparator() {
+        return $this->thousandsSeparator;
+    }
+
+    /**
+     * @param string $thousandsSeparator
+     */
+    public function setThousandsSeparator( $thousandsSeparator ) {
+        $this->thousandsSeparator = $thousandsSeparator;
     }
 
     /**

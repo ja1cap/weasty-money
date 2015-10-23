@@ -128,6 +128,33 @@ class CurrencyResource {
 
     /**
      * @param $currencyAlphabeticCode
+     *
+     * @return int|null
+     */
+    public function getCurrencyDecimalDigits($currencyAlphabeticCode){
+        return $this->getCurrencyParameter($currencyAlphabeticCode, 'decimalDigits') ?: Intl::getCurrencyBundle()->getFractionDigits($currencyAlphabeticCode);
+    }
+
+    /**
+     * @param $currencyAlphabeticCode
+     *
+     * @return string
+     */
+    public function getCurrencyDecimalPoint($currencyAlphabeticCode){
+        return $this->getCurrencyParameter($currencyAlphabeticCode, 'decimalPoint') ?: '.';
+    }
+
+    /**
+     * @param $currencyAlphabeticCode
+     *
+     * @return string
+     */
+    public function getCurrencyThousandsSeparator($currencyAlphabeticCode){
+        return $this->getCurrencyParameter($currencyAlphabeticCode, 'thousandsSeparator') ?: ' ';
+    }
+
+    /**
+     * @param $currencyAlphabeticCode
      * @return null|integer
      */
     public function getCurrencyNumericCode($currencyAlphabeticCode){

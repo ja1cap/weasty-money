@@ -1,6 +1,5 @@
 <?php
 namespace Weasty\Money\Formatter\Money;
-use Symfony\Component\Intl\Intl;
 use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 use Weasty\Money\Currency\Converter\CurrencyConverterInterface;
 use Weasty\Money\Currency\CurrencyResource;
@@ -100,16 +99,13 @@ class MoneyFormatter implements MoneyFormatterInterface {
         CurrencyResource::CODE_TYPE_ISO_4217_ALPHABETIC
       );
 
-    $fractionDigits = 0;
-
-    if($fractionDigits === null){
-      $currencyBundle = Intl::getCurrencyBundle();
-      $fractionDigits = $currencyBundle->getFractionDigits($currencyAlphabeticCode);
-    }
+    $decimalDigits = $this->getCurrencyResource()->getCurrencyDecimalDigits($currencyAlphabeticCode);
+    $decimalPoint = $this->getCurrencyResource()->getCurrencyDecimalPoint($currencyAlphabeticCode);
+    $thousandsSeparator = $this->getCurrencyResource()->getCurrencyThousandsSeparator($currencyAlphabeticCode);
 
     $value = floatval($value);
 
-    $result = number_format($value, $fractionDigits, ',', ' ');
+    $result = number_format($value, $decimalDigits, $decimalPoint, $thousandsSeparator);
 
     if($appendSymbol){
 
