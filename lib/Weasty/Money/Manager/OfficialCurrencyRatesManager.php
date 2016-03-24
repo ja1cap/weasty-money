@@ -7,6 +7,7 @@ use Weasty\Money\Currency\Rate\CurrencyRateInterface;
 use Weasty\Money\Entity\OfficialCurrencyRate;
 use Weasty\Money\Loader\Exception\RecordsNotFoundException;
 use Weasty\Money\Loader\LoaderFactoryInterface;
+use Weasty\Money\Mapper\CurrencyRateMapper;
 
 /**
  * Class OfficialCurrencyRatesManager
@@ -21,6 +22,11 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
   protected $em;
 
   /**
+   * @var \Weasty\Money\Mapper\CurrencyRateMapper
+   */
+  protected $currencyRateMapper;
+
+  /**
    * @var \Weasty\Doctrine\Entity\AbstractRepository
    */
   protected $officialCurrencyRateRepository;
@@ -32,13 +38,15 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
 
   /**
    * OfficialCurrencyRatesManager constructor.
-   * @param \Doctrine\ORM\EntityManagerInterface $em
+   * @param EntityManagerInterface $em
+   * @param \Weasty\Money\Mapper\CurrencyRateMapper $currencyRateMapper
    * @param AbstractRepository $officialCurrencyRateRepository
    * @param LoaderFactoryInterface $currencyRatesLoaderFactory
    */
-  public function __construct(EntityManagerInterface $em, AbstractRepository $officialCurrencyRateRepository, LoaderFactoryInterface $currencyRatesLoaderFactory)
+  public function __construct(EntityManagerInterface $em, CurrencyRateMapper $currencyRateMapper, AbstractRepository $officialCurrencyRateRepository, LoaderFactoryInterface $currencyRatesLoaderFactory)
   {
     $this->em = $em;
+    $this->currencyRateMapper = $currencyRateMapper;
     $this->officialCurrencyRateRepository = $officialCurrencyRateRepository;
     $this->currencyRatesLoaderFactory = $currencyRatesLoaderFactory;
   }
@@ -59,25 +67,37 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
     }
 
     /**
-     * @var \Weasty\Money\Currency\Rate\CurrencyRateInterface[] $recordsIndexedByCode
+     * @var OfficialCurrencyRate[] $officialCurrencyRates
+     * @var OfficialCurrencyRate[] $officialCurrencyRatesIndexedByCode
      */
-    $recordsIndexedByCode = array_combine(
-      array_map(function (CurrencyRateInterface $record) {
-        return $record->getDestinationAlphabeticCode();
-      }, $records),
-      $records
+    $officialCurrencyRates = $this->officialCurrencyRateRepository->findAll();
+    $officialCurrencyRatesIndexedByCode = array_combine(
+      array_map(function (CurrencyRateInterface $currencyRate) {
+        return $currencyRate->getDestinationAlphabeticCode();
+      }, $officialCurrencyRates),
+      $officialCurrencyRates
     );
 
-    /**
-     * @var OfficialCurrencyRate[] $officialCurrencies
-     */
-    $officialCurrencies = $this->officialCurrencyRateRepository->findAll();
-    foreach ($officialCurrencies as $officialCurrency) {
-      if (empty($recordsIndexedByCode[$officialCurrency->getDestinationAlphabeticCode()])) {
-        continue;
+    $this->currencyRateMapper->setEntityManager($this->em);
+
+    foreach ($records as $record) {
+
+      if (!empty($officialCurrencyRatesIndexedByCode[$record->getDestinationAlphabeticCode()])) {
+        $this->currencyRateMapper->setEntity(
+          $officialCurrencyRatesIndexedByCode[$record->getDestinationAlphabeticCode()]
+        );
+      } else {
+        $this->currencyRateMapper->setEntity(new OfficialCurrencyRate());
+        $this->currencyRateMapper
+          ->setSourceAlphabeticCode($record->getSourceAlphabeticCode())
+          ->setDestinationAlphabeticCode($record->getDestinationAlphabeticCode())
+        ;
+        $this->em->persist($this->currencyRateMapper->getCurrencyRate());
       }
-      $record = $recordsIndexedByCode[$officialCurrency->getDestinationAlphabeticCode()];
-      $officialCurrency->setRate($record->getRate());
+
+      $officialCurrencyRate = $this->currencyRateMapper->getCurrencyRate();
+      $officialCurrencyRate->setRate($record->getRate());
+
     }
 
     if ($flush) {
