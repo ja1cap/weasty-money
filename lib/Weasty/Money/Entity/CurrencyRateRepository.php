@@ -56,7 +56,7 @@ abstract class CurrencyRateRepository extends AbstractRepository {
   }
 
   /**
-   * @return \Weasty\Doctrine\Entity\AbstractRepository
+   * @return \Weasty\Money\Entity\OfficialCurrencyRateRepository
    */
   abstract protected function getOfficialCurrencyRepository();
 
