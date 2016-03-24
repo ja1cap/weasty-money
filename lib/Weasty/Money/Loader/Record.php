@@ -1,13 +1,13 @@
 <?php
-namespace Weasty\Money\Parser;
+namespace Weasty\Money\Loader;
 
 use Weasty\Money\Currency\Rate\CurrencyRateInterface;
 
 /**
- * Class CurrencyRateRecord
- * @package Weasty\Money\Parser
+ * Class Record
+ * @package Weasty\Money\Loader
  */
-class CurrencyRateRecord implements CurrencyRateInterface {
+class Record implements CurrencyRateInterface {
 
   /**
    * Currency ISO-4217-ALPHA code
@@ -27,7 +27,7 @@ class CurrencyRateRecord implements CurrencyRateInterface {
   protected $rate;
 
   /**
-   * CurrencyRateRecord constructor.
+   * Record constructor.
    *
    * @param string $sourceAlphabeticCode
    * @param string $destinationAlphabeticCode

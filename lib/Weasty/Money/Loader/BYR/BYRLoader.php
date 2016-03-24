@@ -1,15 +1,16 @@
 <?php
-namespace Weasty\Money\Parser\BYR;
+namespace Weasty\Money\Loader\BYR;
 
-use Weasty\Money\Parser\CurrencyRatesParserException;
-use Weasty\Money\Parser\CurrencyRatesParserInterface;
-use Weasty\Money\Parser\CurrencyRateRecord;
+use Weasty\Money\Loader\Exception\RecordsNotFoundException;
+use Weasty\Money\Loader\LoaderException;
+use Weasty\Money\Loader\LoaderInterface;
+use Weasty\Money\Loader\Record;
 
 /**
- * Class BYRCurrencyRatesParser
- * @package Weasty\Money\Parser\BYR
+ * Class BYRLoader
+ * @package Weasty\Money\Loader\BYR
  */
-class BYRCurrencyRatesParser implements CurrencyRatesParserInterface {
+class BYRLoader implements LoaderInterface {
 
   const SOURCE_CURRENCY_CODE = 'BYR';
   const DEFAULT_URL = 'http://www.nbrb.by/Services/XmlExRates.aspx';
@@ -20,7 +21,7 @@ class BYRCurrencyRatesParser implements CurrencyRatesParserInterface {
   protected $url;
 
   /**
-   * BYRCurrencyRatesParser constructor.
+   * BYRLoader constructor.
    *
    * @param string $url
    */
@@ -32,9 +33,9 @@ class BYRCurrencyRatesParser implements CurrencyRatesParserInterface {
    * @param \DateTime|null $dateTime
    *
    * @return \Weasty\Money\Currency\Rate\CurrencyRateInterface[]
-   * @throws \Weasty\Money\Parser\CurrencyRatesParserException
+   * @throws \Weasty\Money\Loader\LoaderException
    */
-  public function parse( \DateTime $dateTime = null ) {
+  public function load(\DateTime $dateTime = null ) {
 
     if ( !$dateTime ) {
       $dateTime = new \DateTime();
@@ -48,23 +49,23 @@ class BYRCurrencyRatesParser implements CurrencyRatesParserInterface {
     $responseData = json_decode( $json, true );
 
     if ( empty( $responseData['Currency'] ) ) {
-      throw new CurrencyRatesParserException( "Currency rates not found[$response]" );
+      throw new RecordsNotFoundException( "Currency rates not found[$response]" );
     }
 
     if ( empty( $responseData['@attributes']['Date'] ) ) {
-      throw new CurrencyRatesParserException( "Date not found in response[$response]" );
+      throw new LoaderException( "Date not found in response[$response]" );
     }
     $responseDate = $responseData['@attributes']['Date'];
 
     if ( $parseDate != $responseDate ) {
-      throw new CurrencyRatesParserException( "Parse date[$parseDate] is not equal to response date[$responseDate]" );
+      throw new LoaderException( "Parse date[$parseDate] is not equal to response date[$responseDate]" );
     }
 
     $records = $responseData['Currency'];
     $currencyRecords = array_map(function($record){
       $code = $record['CharCode'];
       $rate = filter_var( $record['Rate'], FILTER_VALIDATE_FLOAT );
-      return new CurrencyRateRecord( self::SOURCE_CURRENCY_CODE, $code, $rate);
+      return new Record( self::SOURCE_CURRENCY_CODE, $code, $rate);
     }, $records);
     
     return $currencyRecords;
