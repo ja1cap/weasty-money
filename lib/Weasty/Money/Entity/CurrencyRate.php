@@ -17,22 +17,22 @@ class CurrencyRate extends AbstractCurrencyRate
   /**
    * @var boolean
    */
-  protected $upatableFromOfficial;
+  protected $upatableFromOfficial = true;
 
   /**
    * @var integer
    */
-  protected $officialOffsetType;
+  protected $officialOffsetType = self::OFFICIAL_OFFSET_TYPE_PERCENT;
 
   /**
    * @var float
    */
-  protected $officialOffsetPercent;
+  protected $officialOffsetPercent = 0;
 
   /**
    * @var float
    */
-  protected $officialOffsetValue;
+  protected $officialOffsetValue = 0;
 
   /**
    * @return boolean
