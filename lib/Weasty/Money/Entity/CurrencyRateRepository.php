@@ -11,11 +11,28 @@ use Weasty\Doctrine\Entity\AbstractRepository;
 abstract class CurrencyRateRepository extends AbstractRepository {
 
   /**
+   * @param string|null $sourceAlphabeticCode
+   * @param string|null $destinationCurrencyCode
+   *
    * @return \Weasty\Money\Entity\CurrencyRate[]
    * @throws \Exception
    */
-  public function updateFromOfficial() {
-    $currencies        = $this->findAll();
+  public function updateFromOfficial( $sourceAlphabeticCode = null, $destinationCurrencyCode = null ) {
+
+    if ( $sourceAlphabeticCode || $destinationCurrencyCode ) {
+      $currencies = $this->findBy(
+        array_filter(
+          [
+            'sourceAlphabeticCode'    => (string) $sourceAlphabeticCode,
+            'destinationCurrencyCode' => (string) $destinationCurrencyCode,
+          ]
+        )
+      );
+    }
+    else {
+      $currencies = $this->findAll();
+    }
+
     $updatedCurrencies = [ ];
     foreach ( $currencies as $currency ) {
       if ( $currency instanceof CurrencyRate ) {
