@@ -4,7 +4,7 @@ namespace Weasty\Money\Mapper;
 use Weasty\Doctrine\Mapper\AbstractEntityMapper;
 use Weasty\Money\Currency\Code\CurrencyCodeConverterInterface;
 use Weasty\Money\Currency\CurrencyResource;
-use Weasty\Money\Entity\CurrencyRate;
+use Weasty\Money\Entity\AbstractCurrencyRate;
 
 /**
  * Class CurrencyRateMapper
@@ -18,13 +18,13 @@ class CurrencyRateMapper extends AbstractEntityMapper {
     private $currencyCodeConverter;
 
     /**
-     * @return \Weasty\Money\Entity\CurrencyRate
+     * @return \Weasty\Money\Entity\AbstractCurrencyRate
      * @throws \Exception
      */
     public function getCurrencyRate()
     {
-        if(!$this->getEntity() instanceof CurrencyRate){
-            throw new \Exception('CurrencyRateMapper::$entity must be instance of \Weasty\Money\Entity\CurrencyRate', 500);
+        if(!$this->getEntity() instanceof AbstractCurrencyRate){
+            throw new \Exception('CurrencyRateMapper::$entity must be instance of '.AbstractCurrencyRate::class);
         }
         return $this->getEntity();
     }
