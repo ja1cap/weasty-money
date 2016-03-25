@@ -52,13 +52,13 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
   }
 
   /**
-   * @param $sourceCurrencyCode
+   * @param $currencyCode
    * @param bool $flush
    */
-  public function updateRepositoryFromRemote($sourceCurrencyCode, $flush = true)
+  public function updateRepositoryFromRemote($currencyCode, $flush = true)
   {
 
-    $loader = $this->currencyRatesLoaderFactory->create($sourceCurrencyCode);
+    $loader = $this->currencyRatesLoaderFactory->create( $currencyCode);
 
     try {
       $records = $loader->load(new \DateTime('tomorrow'));
@@ -73,7 +73,7 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
     $officialCurrencyRates = $this->officialCurrencyRateRepository->findAll();
     $officialCurrencyRatesIndexedByCode = array_combine(
       array_map(function (CurrencyRateInterface $currencyRate) {
-        return $currencyRate->getDestinationAlphabeticCode();
+        return $currencyRate->getSourceAlphabeticCode();
       }, $officialCurrencyRates),
       $officialCurrencyRates
     );
@@ -82,9 +82,9 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
 
     foreach ($records as $record) {
 
-      if (!empty($officialCurrencyRatesIndexedByCode[$record->getDestinationAlphabeticCode()])) {
+      if (!empty($officialCurrencyRatesIndexedByCode[$record->getSourceAlphabeticCode()])) {
         $this->currencyRateMapper->setEntity(
-          $officialCurrencyRatesIndexedByCode[$record->getDestinationAlphabeticCode()]
+          $officialCurrencyRatesIndexedByCode[$record->getSourceAlphabeticCode()]
         );
       } else {
         /**

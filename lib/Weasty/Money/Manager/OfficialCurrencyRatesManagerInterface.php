@@ -9,9 +9,9 @@ interface OfficialCurrencyRatesManagerInterface
 {
 
   /**
-   * @param $sourceCurrencyCode
+   * @param $currencyCode
    * @param bool $flush
    */
-  public function updateRepositoryFromRemote($sourceCurrencyCode, $flush = true);
+  public function updateRepositoryFromRemote($currencyCode, $flush = true);
 
 }
