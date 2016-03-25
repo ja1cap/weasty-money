@@ -12,7 +12,7 @@ use Weasty\Money\Loader\Record;
  */
 class BYRLoader implements LoaderInterface {
 
-  const SOURCE_CURRENCY_CODE = 'BYR';
+  const DESTINATION_CURRENCY_CODE = 'BYR';
   const DEFAULT_URL = 'http://www.nbrb.by/Services/XmlExRates.aspx';
 
   /**
@@ -73,7 +73,7 @@ class BYRLoader implements LoaderInterface {
               break;
             default:
               $rate   = filter_var( $record['Rate'], FILTER_VALIDATE_FLOAT );
-              $record = new Record( self::SOURCE_CURRENCY_CODE, $code, $rate );
+              $record = new Record( $code, self::DESTINATION_CURRENCY_CODE, $rate );
           }
 
           return $record;
