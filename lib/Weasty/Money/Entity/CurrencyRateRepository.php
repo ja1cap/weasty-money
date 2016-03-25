@@ -24,7 +24,7 @@ abstract class CurrencyRateRepository extends AbstractRepository {
         array_filter(
           [
             'sourceAlphabeticCode'    => (string) $sourceAlphabeticCode,
-            'destinationCurrencyCode' => (string) $destinationCurrencyCode,
+            'destinationAlphabeticCode' => (string) $destinationCurrencyCode,
           ]
         )
       );
@@ -42,7 +42,7 @@ abstract class CurrencyRateRepository extends AbstractRepository {
         $officialCurrency = $this->getOfficialCurrencyRepository()->findOneBy(
           [
             'sourceAlphabeticCode'    => $currency->getSourceAlphabeticCode(),
-            'destinationCurrencyCode' => $currency->getDestinationAlphabeticCode(),
+            'destinationAlphabeticCode' => $currency->getDestinationAlphabeticCode(),
           ]
         );
         if ( !$officialCurrency instanceof OfficialCurrencyRate ) {
