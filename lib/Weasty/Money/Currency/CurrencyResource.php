@@ -69,32 +69,32 @@ class CurrencyResource {
    */
   protected function buildCurrency( $alphabeticCode, array $data = array() ) {
 
+    $defaultData = [
+      'name'               => $alphabeticCode,
+      'symbol'             => $alphabeticCode,
+      'alphabeticCode'     => $alphabeticCode,
+      'numericCode'        => 0,
+      'decimalDigits'      => 2,
+      'decimalPoint'       => '.',
+      'thousandsSeparator' => ' ',
+    ];
+
     try {
 
-      $name               = $this->getCurrencyBundle()->getCurrencyName( $alphabeticCode, $this->getLocale() );
-      $symbol             = $this->currencyBundle->getCurrencySymbol( $alphabeticCode, $this->getLocale() );
-      $numericCode        = $this->getCurrencyBundle()->getNumericCode( $alphabeticCode );
-      $decimalDigits      = $this->getCurrencyBundle()->getFractionDigits( $alphabeticCode );
-      $decimalPoint       = '.';
-      $thousandsSeparator = ' ';
-
-      $defaultData = [
-        'name'               => $name,
-        'symbol'             => $symbol,
-        'alphabeticCode'     => $alphabeticCode,
-        'numericCode'        => $numericCode,
-        'decimalDigits'      => $decimalDigits,
-        'decimalPoint'       => $decimalPoint,
-        'thousandsSeparator' => $thousandsSeparator,
-      ];
-
-      $currency = new Currency( $data + $defaultData );
+      $defaultData['name']          = $this->getCurrencyBundle()->getCurrencyName(
+        $alphabeticCode,
+        $this->getLocale()
+      );
+      $defaultData['symbol']        = $this->currencyBundle->getCurrencySymbol( $alphabeticCode, $this->getLocale() );
+      $defaultData['numericCode']   = $this->getCurrencyBundle()->getNumericCode( $alphabeticCode );
+      $defaultData['decimalDigits'] = $this->getCurrencyBundle()->getFractionDigits( $alphabeticCode );
 
     }
     catch ( \Exception $e ) {
-      $currency = null;
+      trigger_error( $e->getMessage(), E_USER_WARNING );
     }
 
+    $currency = new Currency( $data + $defaultData );
 
     return $currency;
 
