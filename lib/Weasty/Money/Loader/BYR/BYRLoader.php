@@ -35,7 +35,7 @@ class BYRLoader implements LoaderInterface {
    * @return \Weasty\Money\Currency\Rate\CurrencyRateInterface[]
    * @throws \Weasty\Money\Loader\LoaderException
    */
-  public function load(\DateTime $dateTime = null ) {
+  public function load( \DateTime $dateTime = null ) {
 
     if ( !$dateTime ) {
       $dateTime = new \DateTime();
@@ -61,13 +61,27 @@ class BYRLoader implements LoaderInterface {
       throw new LoaderException( "Parse date[$parseDate] is not equal to response date[$responseDate]" );
     }
 
-    $records = $responseData['Currency'];
-    $currencyRecords = array_map(function($record){
-      $code = $record['CharCode'];
-      $rate = filter_var( $record['Rate'], FILTER_VALIDATE_FLOAT );
-      return new Record( self::SOURCE_CURRENCY_CODE, $code, $rate);
-    }, $records);
-    
+    $records         = $responseData['Currency'];
+    $currencyRecords = array_filter(
+      array_map(
+        function ( $record ) {
+          $code = $record['CharCode'];
+          switch ( $code ) {
+            case 'XDR':
+              // External Data Representation is not common currency
+              $record = null;
+              break;
+            default:
+              $rate   = filter_var( $record['Rate'], FILTER_VALIDATE_FLOAT );
+              $record = new Record( self::SOURCE_CURRENCY_CODE, $code, $rate );
+          }
+
+          return $record;
+        },
+        $records
+      )
+    );
+
     return $currencyRecords;
 
   }
