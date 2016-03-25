@@ -9,189 +9,233 @@ use Symfony\Component\Intl\Intl;
  */
 class CurrencyResource {
 
-    const CODE_TYPE_ISO_4217_NUMERIC = 'ISO-4217-NUM';
-    const CODE_TYPE_ISO_4217_ALPHABETIC = 'ISO-4217-ALPHA';
+  const CODE_TYPE_ISO_4217_NUMERIC = 'ISO-4217-NUM';
+  const CODE_TYPE_ISO_4217_ALPHABETIC = 'ISO-4217-ALPHA';
 
-    /**
-     * @var array
-     */
-    protected $currencies;
+  /**
+   * @var array
+   */
+  protected $currencies;
 
-    /**
-     * @var string
-     */
-    protected $defaultCurrency;
+  /**
+   * @var string
+   */
+  protected $defaultCurrency;
 
-    /**
-     * @var string
-     */
-    protected $locale;
+  /**
+   * @var string
+   */
+  protected $locale;
 
-    /**
-     * @param $currencies
-     * @param $defaultCurrency
-     * @param $locale
-     */
-    function __construct($currencies, $defaultCurrency, $locale)
-    {
+  /**
+   * @var \Symfony\Component\Intl\ResourceBundle\CurrencyBundle
+   */
+  protected $currencyBundle;
 
-        $this->defaultCurrency = $defaultCurrency;
-        $this->locale = $locale;
+  /**
+   * @param $currencies
+   * @param $defaultCurrency
+   * @param $locale
+   */
+  function __construct( $currencies = [ ], $defaultCurrency, $locale ) {
 
-        $this->currencies = array();
+    $this->currencyBundle = Intl::getCurrencyBundle();
 
-        if(is_array($currencies)){
-            foreach($currencies as $alphabeticCode => $data){
-                $this->currencies[$alphabeticCode] = $this->buildCurrency($alphabeticCode, $data);
-            }
+    $this->defaultCurrency = $defaultCurrency;
+    $this->locale          = $locale;
+
+    $this->currencies = [ ];
+
+    if ( empty( $currencies ) ) {
+      $currencies = array_fill_keys( $this->getCurrencyBundle()->getCurrencies(), [ ] );
+    }
+
+    if ( is_array( $currencies ) ) {
+      foreach ( $currencies as $alphabeticCode => $data ) {
+        $currency = $this->buildCurrency( $alphabeticCode, $data );
+        if ( $currency ) {
+          $this->currencies[ $alphabeticCode ] = $currency;
         }
-
+      }
     }
 
-    /**
-     * @param $currencyAlphabeticCode
-     * @param array $data
-     * @return Currency
-     */
-    protected function buildCurrency($currencyAlphabeticCode, array $data = array()){
+  }
 
-        $currency = new Currency($data);
-        $currency->setAlphabeticCode($currencyAlphabeticCode);
+  /**
+   * @param $alphabeticCode
+   * @param array $data
+   *
+   * @return Currency|null
+   */
+  protected function buildCurrency( $alphabeticCode, array $data = array() ) {
 
-        if(!$currency->getName()){
-            $name = Intl::getCurrencyBundle()->getCurrencyName($currencyAlphabeticCode, $this->getLocale());
-            $currency->setName($name);
-        }
+    try {
 
-        return $currency;
+      $name               = $this->getCurrencyBundle()->getCurrencyName( $alphabeticCode, $this->getLocale() );
+      $symbol             = $this->currencyBundle->getCurrencySymbol( $alphabeticCode, $this->getLocale() );
+      $numericCode        = $this->getCurrencyBundle()->getNumericCode( $alphabeticCode );
+      $decimalDigits      = $this->getCurrencyBundle()->getFractionDigits( $alphabeticCode );
+      $decimalPoint       = '.';
+      $thousandsSeparator = ' ';
 
-    }
+      $defaultData = [
+        'name'               => $name,
+        'symbol'             => $symbol,
+        'alphabeticCode'     => $alphabeticCode,
+        'numericCode'        => $numericCode,
+        'decimalDigits'      => $decimalDigits,
+        'decimalPoint'       => $decimalPoint,
+        'thousandsSeparator' => $thousandsSeparator,
+      ];
 
-    /**
-     * @param $currencyAlphabeticCode
-     * @return null|Currency|array
-     */
-    public function getCurrency($currencyAlphabeticCode){
-        if(isset($this->currencies[$currencyAlphabeticCode])){
-            return $this->currencies[$currencyAlphabeticCode];
-        }
-        return null;
-    }
-
-    /**
-     * @param $currencyAlphabeticCode
-     * @param $parameterName
-     * @return mixed
-     */
-    public function getCurrencyParameter($currencyAlphabeticCode, $parameterName){
-
-        $currency = $this->getCurrency($currencyAlphabeticCode);
-
-        if($currency && isset($currency[$parameterName])){
-            return $currency[$parameterName];
-        }
-
-        return null;
+      $currency = new Currency( $data + $defaultData );
 
     }
-
-    /**
-     * @return array
-     */
-    public function getCurrencies()
-    {
-        return $this->currencies;
+    catch ( \Exception $e ) {
+      $currency = null;
     }
 
-    /**
-     * @return array
-     */
-    public function getCurrencyAlphabeticCodes(){
-        return array_keys($this->getCurrencies());
+
+    return $currency;
+
+  }
+
+  /**
+   * @param $alphabeticCode
+   *
+   * @return null|Currency|array
+   */
+  public function getCurrency( $alphabeticCode ) {
+    if ( !isset( $this->currencies[ $alphabeticCode ] ) ) {
+      $this->currencies[ $alphabeticCode ] = $this->buildCurrency( $alphabeticCode );
     }
 
-    /**
-     * @param $currencyAlphabeticCode
-     * @return null|string
-     */
-    public function getCurrencyName($currencyAlphabeticCode){
-        return $this->getCurrencyParameter($currencyAlphabeticCode, 'name') ?: Intl::getCurrencyBundle()->getCurrencyName($currencyAlphabeticCode, $this->getLocale());
+    return $this->currencies[ $alphabeticCode ];
+  }
+
+  /**
+   * @param $alphabeticCode
+   * @param $parameterName
+   *
+   * @return mixed
+   */
+  public function getCurrencyParameter( $alphabeticCode, $parameterName ) {
+
+    $currency = $this->getCurrency( $alphabeticCode );
+
+    if ( $currency && isset( $currency[ $parameterName ] ) ) {
+      return $currency[ $parameterName ];
     }
 
-    /**
-     * @param $currencyAlphabeticCode
-     * @return null|string
-     */
-    public function getCurrencySymbol($currencyAlphabeticCode){
-        return $this->getCurrencyParameter($currencyAlphabeticCode, 'symbol') ?: Intl::getCurrencyBundle()->getCurrencySymbol($currencyAlphabeticCode, $this->getLocale());
+    return null;
+
+  }
+
+  /**
+   * @return array
+   */
+  public function getCurrencies() {
+    return $this->currencies;
+  }
+
+  /**
+   * @return array
+   */
+  public function getCurrencyAlphabeticCodes() {
+    return array_keys( $this->getCurrencies() );
+  }
+
+  /**
+   * @param $currencyAlphabeticCode
+   *
+   * @return null|string
+   */
+  public function getCurrencyName( $currencyAlphabeticCode ) {
+    return $this->getCurrencyParameter( $currencyAlphabeticCode, 'name' );
+  }
+
+  /**
+   * @param $currencyAlphabeticCode
+   *
+   * @return null|string
+   */
+  public function getCurrencySymbol( $currencyAlphabeticCode ) {
+    return $this->getCurrencyParameter( $currencyAlphabeticCode, 'symbol' );
+  }
+
+  /**
+   * @param $currencyAlphabeticCode
+   *
+   * @return int|null
+   */
+  public function getCurrencyDecimalDigits( $currencyAlphabeticCode ) {
+    return $this->getCurrencyParameter( $currencyAlphabeticCode, 'decimalDigits' );
+  }
+
+  /**
+   * @param $currencyAlphabeticCode
+   *
+   * @return string
+   */
+  public function getCurrencyDecimalPoint( $currencyAlphabeticCode ) {
+    return $this->getCurrencyParameter( $currencyAlphabeticCode, 'decimalPoint' );
+  }
+
+  /**
+   * @param $currencyAlphabeticCode
+   *
+   * @return string
+   */
+  public function getCurrencyThousandsSeparator( $currencyAlphabeticCode ) {
+    return $this->getCurrencyParameter( $currencyAlphabeticCode, 'thousandsSeparator' );
+  }
+
+  /**
+   * @param $currencyAlphabeticCode
+   *
+   * @return null|integer
+   */
+  public function getCurrencyNumericCode( $currencyAlphabeticCode ) {
+    return $this->getCurrencyParameter( $currencyAlphabeticCode, 'numericCode' );
+  }
+
+  /**
+   * @param $numericCode
+   *
+   * @return null|string
+   */
+  public function getCurrencyAlphabeticCode( $numericCode ) {
+
+    foreach ( $this->getCurrencies() as $alphabeticCode => $currency ) {
+      if ( isset( $currency['numericCode'] ) && $currency['numericCode'] == $numericCode ) {
+        return $alphabeticCode;
+        break;
+      }
     }
 
-    /**
-     * @param $currencyAlphabeticCode
-     *
-     * @return int|null
-     */
-    public function getCurrencyDecimalDigits($currencyAlphabeticCode){
-        return $this->getCurrencyParameter($currencyAlphabeticCode, 'decimalDigits') ?: Intl::getCurrencyBundle()->getFractionDigits($currencyAlphabeticCode);
-    }
+    return null;
 
-    /**
-     * @param $currencyAlphabeticCode
-     *
-     * @return string
-     */
-    public function getCurrencyDecimalPoint($currencyAlphabeticCode){
-        return $this->getCurrencyParameter($currencyAlphabeticCode, 'decimalPoint') ?: '.';
-    }
+  }
 
-    /**
-     * @param $currencyAlphabeticCode
-     *
-     * @return string
-     */
-    public function getCurrencyThousandsSeparator($currencyAlphabeticCode){
-        return $this->getCurrencyParameter($currencyAlphabeticCode, 'thousandsSeparator') ?: ' ';
-    }
+  /**
+   * @return string
+   */
+  public function getDefaultCurrency() {
+    return $this->defaultCurrency;
+  }
 
-    /**
-     * @param $currencyAlphabeticCode
-     * @return null|integer
-     */
-    public function getCurrencyNumericCode($currencyAlphabeticCode){
-        return $this->getCurrencyParameter($currencyAlphabeticCode, 'numericCode');
-    }
+  /**
+   * @return string
+   */
+  public function getLocale() {
+    return $this->locale;
+  }
 
-    /**
-     * @param $currencyNumericCode
-     * @return null|string
-     */
-    public function getCurrencyAlphabeticCode($currencyNumericCode){
-
-        foreach($this->getCurrencies() as $currencyAlphabeticCode => $currency){
-            if(isset($currency['numericCode']) && $currency['numericCode'] == $currencyNumericCode){
-                return $currencyAlphabeticCode;
-                break;
-            }
-        }
-
-        return null;
-
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultCurrency()
-    {
-        return $this->defaultCurrency;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
+  /**
+   * @return \Symfony\Component\Intl\ResourceBundle\CurrencyBundle
+   */
+  protected function getCurrencyBundle() {
+    return $this->currencyBundle;
+  }
 
 } 
