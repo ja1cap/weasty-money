@@ -87,7 +87,11 @@ class OfficialCurrencyRatesManager implements OfficialCurrencyRatesManagerInterf
           $officialCurrencyRatesIndexedByCode[$record->getDestinationAlphabeticCode()]
         );
       } else {
-        $this->currencyRateMapper->setEntity(new OfficialCurrencyRate());
+        /**
+         * @var $officialCurrencyRate OfficialCurrencyRate
+         */
+        $officialCurrencyRate = $this->officialCurrencyRateRepository->create();
+        $this->currencyRateMapper->setEntity($officialCurrencyRate);
         $this->currencyRateMapper
           ->setSourceAlphabeticCode($record->getSourceAlphabeticCode())
           ->setDestinationAlphabeticCode($record->getDestinationAlphabeticCode())
