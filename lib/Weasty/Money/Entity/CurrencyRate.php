@@ -17,7 +17,7 @@ class CurrencyRate extends AbstractCurrencyRate
   /**
    * @var boolean
    */
-  protected $upatableFromOfficial = true;
+  protected $updatableFromOfficial = true;
 
   /**
    * @var integer
@@ -37,15 +37,15 @@ class CurrencyRate extends AbstractCurrencyRate
   /**
    * @return boolean
    */
-  public function isUpatableFromOfficial() {
-    return $this->upatableFromOfficial;
+  public function isUpdatableFromOfficial() {
+    return $this->updatableFromOfficial;
   }
 
   /**
-   * @param boolean $upatableFromOfficial
+   * @param boolean $updatableFromOfficial
    */
-  public function setUpatableFromOfficial( $upatableFromOfficial ) {
-    $this->upatableFromOfficial = $upatableFromOfficial;
+  public function setUpdatableFromOfficial($updatableFromOfficial ) {
+    $this->updatableFromOfficial = $updatableFromOfficial;
   }
 
   /**

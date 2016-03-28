@@ -36,7 +36,7 @@ abstract class CurrencyRateRepository extends AbstractRepository {
     $updatedCurrencies = [ ];
     foreach ( $currencies as $currency ) {
       if ( $currency instanceof CurrencyRate ) {
-        if ( !$currency->isUpatableFromOfficial() ) {
+        if ( !$currency->isUpdatableFromOfficial() ) {
           continue;
         }
         $officialCurrency = $this->getOfficialCurrencyRepository()->findOneBy(
