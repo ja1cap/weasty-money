@@ -40,6 +40,34 @@ class AbstractCurrencyRate extends AbstractEntity implements CurrencyRateInterfa
    */
   protected $rate;
 
+  /**
+   * @var \DateTime
+   */
+  protected $createDate;
+
+  /**
+   * @var \DateTime
+   */
+  protected $updateDate;
+
+  /**
+   * AbstractCurrencyRate constructor.
+   * @param \DateTime $createDate
+   */
+  public function __construct(\DateTime $createDate = null)
+  {
+    $this->createDate = ( $createDate ?: new \DateTime() );
+  }
+
+  public function prePersist()
+  {
+    $this->setCreateDate(new \DateTime());
+  }
+
+  public function preUpdate()
+  {
+    $this->setUpdateDate(new \DateTime());
+  }
 
   /**
    * Get id
@@ -171,6 +199,52 @@ class AbstractCurrencyRate extends AbstractEntity implements CurrencyRateInterfa
   public function getRate()
   {
     return $this->rate;
+  }
+
+  /**
+   * Set createDate
+   *
+   * @param \DateTime $createDate
+   * @return $this
+   */
+  public function setCreateDate($createDate)
+  {
+    $this->createDate = $createDate ?: new \DateTime();
+
+    return $this;
+  }
+
+  /**
+   * Get createDate
+   *
+   * @return \DateTime
+   */
+  public function getCreateDate()
+  {
+    return $this->createDate;
+  }
+
+  /**
+   * Set updateDate
+   *
+   * @param \DateTime $updateDate
+   * @return $this
+   */
+  public function setUpdateDate($updateDate)
+  {
+    $this->updateDate = $updateDate ?: new \DateTime();
+
+    return $this;
+  }
+
+  /**
+   * Get updateDate
+   *
+   * @return \DateTime
+   */
+  public function getUpdateDate()
+  {
+    return $this->updateDate;
   }
 
 }
