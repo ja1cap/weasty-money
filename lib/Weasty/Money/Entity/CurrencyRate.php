@@ -42,6 +42,13 @@ class CurrencyRate extends AbstractCurrencyRate
   }
 
   /**
+   * @return boolean
+   */
+  public function getUpdatableFromOfficial(){
+    return $this->isUpdatableFromOfficial();
+  }
+
+  /**
    * @param boolean $updatableFromOfficial
    */
   public function setUpdatableFromOfficial($updatableFromOfficial ) {
@@ -88,6 +95,19 @@ class CurrencyRate extends AbstractCurrencyRate
    */
   public function setOfficialOffsetValue( $officialOffsetValue ) {
     $this->officialOffsetValue = $officialOffsetValue;
+  }
+
+  /**
+   * @return array
+   */
+  public function toArray()
+  {
+    return parent::toArray() + [
+      'updatableFromOfficial' => $this->getUpdatableFromOfficial(),
+      'officialOffsetType' => $this->getOfficialOffsetType(),
+      'officialOffsetPercent' => $this->getOfficialOffsetPercent(),
+      'officialOffsetValue' => $this->getOfficialOffsetValue(),
+    ];
   }
 
 }

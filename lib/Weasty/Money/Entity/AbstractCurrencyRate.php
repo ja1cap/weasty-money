@@ -8,7 +8,7 @@ use Weasty\Money\Currency\Rate\CurrencyRateInterface;
  * Class AbstractCurrencyRate
  * @package Weasty\Money\Entity
  */
-class AbstractCurrencyRate extends AbstractEntity implements CurrencyRateInterface {
+class AbstractCurrencyRate extends AbstractEntity implements CurrencyRateInterface, \JsonSerializable {
 
   /**
    * @var integer
@@ -245,6 +245,33 @@ class AbstractCurrencyRate extends AbstractEntity implements CurrencyRateInterfa
   public function getUpdateDate()
   {
     return $this->updateDate;
+  }
+
+  /**
+   * @return array
+   */
+  public function toArray()
+  {
+    return [
+        'id' => $this->getId(),
+        'sourceCurrencyAlphabeticCode' => $this->getSourceAlphabeticCode(),
+        'sourceNumericCode' => $this->getSourceNumericCode(),
+        'destinationAlphabeticCode' => $this->getDestinationAlphabeticCode(),
+        'destinationNumericCode' => $this->getDestinationAlphabeticCode(),
+        'rate' => $this->getRate(),
+    ];
+  }
+
+  /**
+   * Specify data which should be serialized to JSON
+   * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+   * @return mixed data which can be serialized by <b>json_encode</b>,
+   * which is a value of any type other than a resource.
+   * @since 5.4.0
+   */
+  function jsonSerialize()
+  {
+    return $this->toArray();
   }
 
 }
