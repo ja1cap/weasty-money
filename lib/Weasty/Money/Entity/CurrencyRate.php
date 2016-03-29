@@ -105,8 +105,6 @@ class CurrencyRate extends AbstractCurrencyRate
     return parent::toArray() + [
       'updatableFromOfficial' => $this->getUpdatableFromOfficial(),
       'officialOffsetType' => $this->getOfficialOffsetType(),
-      'officialOffsetPercent' => $this->getOfficialOffsetPercent(),
-      'officialOffsetValue' => $this->getOfficialOffsetValue(),
     ];
   }
 
