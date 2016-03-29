@@ -94,7 +94,7 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
         $output->writeln("<info>Update currency rate {$currency->getName()}[{$currency->getAlphabeticCode()}]</info>");
 
         /**
-         * @var $currencyRate \Weasty\Bundle\MoneyBundle\Entity\CurrencyRate
+         * @var $currencyRate \Weasty\Money\Entity\CurrencyRate
          */
         $currencyRate = $currencyRateRepository->findOneBy(
           [

@@ -1,6 +1,7 @@
 <?php
 namespace Weasty\Money\Manager;
 use Symfony\Component\Console\Output\OutputInterface;
+use Weasty\Money\Entity\CurrencyRate;
 
 /**
  * Interface CurrencyRateManagerInterface
@@ -25,6 +26,13 @@ interface CurrencyRateManagerInterface
    * @throws \Exception
    */
   public function updateFromOfficial($sourceAlphabeticCode = null, $destinationCurrencyCode = null);
+
+  /**
+   * @param \Weasty\Money\Entity\CurrencyRate $currencyRate
+   * @return bool
+   * @throws \Exception
+   */
+  public function updateCurrencyFromOfficial(CurrencyRate $currencyRate);
 
   /**
    * @param \Weasty\Doctrine\Entity\AbstractRepository $repository
