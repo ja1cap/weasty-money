@@ -56,79 +56,72 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
    * @param bool $updateExistingFromOfficial
    * @param OutputInterface|null $output
    */
-  public function upsert( array $codes = [], $upsertDefault = false, $updateExistingFromOfficial = false, OutputInterface $output = null )
+  public function upsert(array $codes = [], $upsertDefault = false, $updateExistingFromOfficial = false, OutputInterface $output = null)
   {
 
-    if(!$output){
+    if (!$output) {
       $output = new NullOutput();
     }
 
-    foreach ($this->getCurrencyRateRepositories() as $currencyRateRepository){
+    foreach ($this->getCurrencyRateRepositories() as $currencyRateRepository) {
 
       $currencyResource = $this->currencyResource;
-      $defaultCurrency  = $currencyResource->getCurrency( $currencyResource->getDefaultCurrency() );
+      $defaultCurrency = $currencyResource->getCurrency($currencyResource->getDefaultCurrency());
 
-      if ( $upsertDefault ) {
+      if ($upsertDefault) {
         $currencies = $currencyResource->getCurrencies();
-      }
-      else {
+      } else {
         $currencies = array_map(
-          function ( $code ) use ( $currencyResource ) {
-            return $currencyResource->getCurrency( $code );
+          function ($code) use ($currencyResource) {
+            return $currencyResource->getCurrency($code);
           },
           $codes
         );
       }
 
-      $output->writeln( "<info>Update official currency rates from remote</info>" );
-      $this->getOfficialCurrencyRateManager()->updateRepositoryFromRemote( $defaultCurrency->getAlphabeticCode() );
+      $output->writeln("<info>Update official currency rates from remote</info>");
+      $this->getOfficialCurrencyRateManager()->updateRepositoryFromRemote($defaultCurrency->getAlphabeticCode());
 
       /**
        * @var $currencies \Weasty\Money\Currency\CurrencyInterface[]
        */
-      foreach ( $currencies as $currency ) {
+      foreach ($currencies as $currency) {
 
-        if( $currency->getAlphabeticCode() == $defaultCurrency->getAlphabeticCode() ){
+        if ($currency->getAlphabeticCode() == $defaultCurrency->getAlphabeticCode()) {
           continue;
         }
 
-        $output->writeln( "<info>Update currency rate {$currency->getName()}[{$currency->getAlphabeticCode()}]</info>" );
+        $output->writeln("<info>Update currency rate {$currency->getName()}[{$currency->getAlphabeticCode()}]</info>");
 
         /**
          * @var $currencyRate \Weasty\Bundle\MoneyBundle\Entity\CurrencyRate
          */
         $currencyRate = $currencyRateRepository->findOneBy(
           [
-            'sourceAlphabeticCode'      => $currency->getAlphabeticCode(),
+            'sourceAlphabeticCode' => $currency->getAlphabeticCode(),
             'destinationAlphabeticCode' => $currencyResource->getDefaultCurrency(),
           ]
         );
 
-        $officialCurrencyRate = $this->getOfficialCurrencyRateManager()->getOfficialCurrencyRateRepository()->findOneBy(
-          [
-            'sourceAlphabeticCode'      => $currency->getAlphabeticCode(),
-            'destinationAlphabeticCode' => $currencyResource->getDefaultCurrency(),
-          ]
-        );
-        if ( !$officialCurrencyRate instanceof OfficialCurrencyRate ) {
-          $output->writeln( "<error>Official currency rate not found[{$currency->getAlphabeticCode()}]</error>" );
-          continue;
-        }
-
-        if ( !$currencyRate ) {
+        if (!$currencyRate) {
           $currencyRate = $currencyRateRepository->create();
-          $currencyRate->setSourceAlphabeticCode( $currency->getAlphabeticCode() );
-          $currencyRate->setSourceNumericCode( $currency->getNumericCode() );
-          $currencyRate->setDestinationAlphabeticCode( $defaultCurrency->getAlphabeticCode() );
-          $currencyRate->setDestinationNumericCode( $defaultCurrency->getNumericCode() );
-          $currencyRate->setRate( $officialCurrencyRate->getRate() );
-          $this->em->persist( $currencyRate );
-        }
-        elseif ( $updateExistingFromOfficial || $currencyRate->isUpdatableFromOfficial() || empty( $currencyRate->getRate() ) ) {
-          $currencyRate->setRate( $officialCurrencyRate->getRate() );
+          $currencyRate->setSourceAlphabeticCode($currency->getAlphabeticCode());
+          $currencyRate->setSourceNumericCode($currency->getNumericCode());
+          $currencyRate->setDestinationAlphabeticCode($defaultCurrency->getAlphabeticCode());
+          $currencyRate->setDestinationNumericCode($defaultCurrency->getNumericCode());
+          $this->em->persist($currencyRate);
         }
 
-        $output->writeln( "<info>Currency rate {$currencyRate->getRate()} {$defaultCurrency->getSymbol()}</info>" );
+        if ($updateExistingFromOfficial || $currencyRate->isUpdatableFromOfficial() || empty($currencyRate->getRate())) {
+          try {
+            $this->updateCurrencyFromOfficial($currencyRate);
+          } catch (\Exception $e) {
+            $output->writeln("<error>[{$e->getCode()}]{$e->getMessage()}</error>");
+            continue;
+          }
+        }
+
+        $output->writeln("<info>Currency rate {$currencyRate->getRate()} {$defaultCurrency->getSymbol()}</info>");
 
       }
 
@@ -148,12 +141,12 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
   public function updateFromOfficial($sourceAlphabeticCode = null, $destinationCurrencyCode = null)
   {
 
-    $updatedCurrencies = [];
+    $updatedCurrencyRates = [];
 
     foreach ($this->getCurrencyRateRepositories() as $currencyRateRepository) {
 
       if ($sourceAlphabeticCode || $destinationCurrencyCode) {
-        $currencies = $currencyRateRepository->findBy(
+        $currencyRates = $currencyRateRepository->findBy(
           array_filter(
             [
               'sourceAlphabeticCode' => (string)$sourceAlphabeticCode,
@@ -162,47 +155,70 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
           )
         );
       } else {
-        $currencies = $currencyRateRepository->findAll();
+        $currencyRates = $currencyRateRepository->findAll();
       }
 
-      foreach ($currencies as $currency) {
-        if ($currency instanceof CurrencyRate) {
-          if (!$currency->isUpdatableFromOfficial()) {
-            continue;
+      foreach ($currencyRates as $currencyRate) {
+        if ($currencyRate instanceof CurrencyRate) {
+
+          $oldValue = $currencyRate->getRate();
+          $this->updateCurrencyFromOfficial($currencyRate);
+          if ($currencyRate->getRate() != $oldValue) {
+            $updatedCurrencyRates[] = $currencyRate;
           }
-          $officialCurrency = $this->getOfficialCurrencyRateManager()->getOfficialCurrencyRateRepository()->findOneBy(
-            [
-              'sourceAlphabeticCode' => $currency->getSourceAlphabeticCode(),
-              'destinationAlphabeticCode' => $currency->getDestinationAlphabeticCode(),
-            ]
-          );
-          if (!$officialCurrency instanceof OfficialCurrencyRate) {
-            continue;
-          }
-          switch ($currency->getOfficialOffsetType()) {
-            case CurrencyRate::OFFICIAL_OFFSET_TYPE_PERCENT:
-              $newRate = $officialCurrency->getRate() * ((100 + $currency->getOfficialOffsetPercent()) / 100);
-              break;
-            case CurrencyRate::OFFICIAL_OFFSET_TYPE_VALUE:
-              $newRate = $officialCurrency->getRate() + $currency->getOfficialOffsetValue();
-              break;
-            default:
-              throw new \Exception("Undefined official currency offset type[{$currency->getOfficialOffsetType()}]");
-          }
-          if ($newRate != $currency->getRate()) {
-            $currency->setRate($newRate);
-            $updatedCurrencies[] = $currency;
-          }
+
         }
       }
 
     }
 
-    if ($updatedCurrencies) {
-      $this->em->flush($updatedCurrencies);
+    if ($updatedCurrencyRates) {
+      $this->em->flush($updatedCurrencyRates);
     }
 
-    return $updatedCurrencies;
+    return $updatedCurrencyRates;
+  }
+
+  /**
+   * @param CurrencyRate $currencyRate
+   * @return bool
+   * @throws \Exception
+   */
+  public function updateCurrencyFromOfficial(CurrencyRate $currencyRate)
+  {
+
+    if (!$currencyRate->isUpdatableFromOfficial()) {
+      return false;
+    }
+
+    $officialCurrency = $this->getOfficialCurrencyRateManager()->getOfficialCurrencyRateRepository()->findOneBy(
+      [
+        'sourceAlphabeticCode' => $currencyRate->getSourceAlphabeticCode(),
+        'destinationAlphabeticCode' => $currencyRate->getDestinationAlphabeticCode(),
+      ]
+    );
+
+    if (!$officialCurrency instanceof OfficialCurrencyRate) {
+      throw new \Exception("Official currency rate not found[{$currencyRate->getSourceAlphabeticCode()}]");
+    }
+
+    switch ($currencyRate->getOfficialOffsetType()) {
+      case CurrencyRate::OFFICIAL_OFFSET_TYPE_PERCENT:
+        $newRate = $officialCurrency->getRate() * ((100 + $currencyRate->getOfficialOffsetPercent()) / 100);
+        break;
+      case CurrencyRate::OFFICIAL_OFFSET_TYPE_VALUE:
+        $newRate = $officialCurrency->getRate() + $currencyRate->getOfficialOffsetValue();
+        break;
+      default:
+        throw new \Exception("Undefined official currency offset type[{$currencyRate->getOfficialOffsetType()}]");
+    }
+
+    if ($newRate != $currencyRate->getRate()) {
+      $currencyRate->setRate($newRate);
+    }
+
+    return true;
+
   }
 
   /**
