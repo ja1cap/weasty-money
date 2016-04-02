@@ -5,8 +5,8 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Weasty\Money\Currency\CurrencyResource;
-use Weasty\Money\Entity\CurrencyRate;
-use Weasty\Money\Entity\OfficialCurrencyRate;
+use Weasty\Money\Currency\Rate\OfficialCurrencyRateInterface;
+use Weasty\Money\Currency\Rate\UpdatableFromOfficialCurrencyRateInterface;
 
 /**
  * Class CurrencyRateManager
@@ -14,11 +14,6 @@ use Weasty\Money\Entity\OfficialCurrencyRate;
  */
 class CurrencyRateManager implements CurrencyRateManagerInterface
 {
-
-  /**
-   * @var \Doctrine\ORM\EntityManager
-   */
-  protected $em;
 
   /**
    * @var \Weasty\Money\Currency\CurrencyResource
@@ -37,14 +32,12 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
 
   /**
    * CurrencyRateManager constructor.
-   * @param \Doctrine\ORM\EntityManager $em
    * @param \Weasty\Money\Currency\CurrencyResource $currencyResource
    * @param \Weasty\Money\Manager\OfficialCurrencyRateManagerInterface $officialCurrencyRateManager
    * @param \Weasty\Doctrine\Entity\AbstractRepository[] $currencyRatesRepositories
    */
-  public function __construct(EntityManager $em, CurrencyResource $currencyResource, OfficialCurrencyRateManagerInterface $officialCurrencyRateManager, array $currencyRatesRepositories = [])
+  public function __construct(CurrencyResource $currencyResource, OfficialCurrencyRateManagerInterface $officialCurrencyRateManager, array $currencyRatesRepositories = [])
   {
-    $this->em = $em;
     $this->currencyResource = $currencyResource;
     $this->officialCurrencyRateManager = $officialCurrencyRateManager;
     $this->currencyRateRepositories = $currencyRatesRepositories;
@@ -55,8 +48,9 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
    * @param bool $upsertDefault
    * @param bool $updateExistingFromOfficial
    * @param OutputInterface|null $output
+   * @param \Doctrine\ORM\EntityManager|null $em
    */
-  public function upsert(array $codes = [], $upsertDefault = false, $updateExistingFromOfficial = false, OutputInterface $output = null)
+  public function upsert(array $codes = [], $upsertDefault = false, $updateExistingFromOfficial = false, OutputInterface $output = null, EntityManager $em)
   {
 
     if (!$output) {
@@ -109,7 +103,7 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
           $currencyRate->setSourceNumericCode($currency->getNumericCode());
           $currencyRate->setDestinationAlphabeticCode($defaultCurrency->getAlphabeticCode());
           $currencyRate->setDestinationNumericCode($defaultCurrency->getNumericCode());
-          $this->em->persist($currencyRate);
+          $em->persist($currencyRate);
         }
 
         if ($updateExistingFromOfficial || $currencyRate->isUpdatableFromOfficial() || empty($currencyRate->getRate())) {
@@ -127,18 +121,19 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
 
     }
 
-    $this->em->flush();
+    $em->flush();
 
   }
 
   /**
    * @param string|null $sourceAlphabeticCode
    * @param string|null $destinationCurrencyCode
+   * @param \Doctrine\ORM\EntityManager $em
    *
    * @return \Weasty\Money\Entity\CurrencyRate[]
    * @throws \Exception
    */
-  public function updateFromOfficial($sourceAlphabeticCode = null, $destinationCurrencyCode = null)
+  public function updateFromOfficial($sourceAlphabeticCode = null, $destinationCurrencyCode = null, EntityManager $em)
   {
 
     $updatedCurrencyRates = [];
@@ -159,7 +154,7 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
       }
 
       foreach ($currencyRates as $currencyRate) {
-        if ($currencyRate instanceof CurrencyRate) {
+        if ($currencyRate instanceof UpdatableFromOfficialCurrencyRateInterface) {
 
           $oldValue = $currencyRate->getRate();
           $this->updateCurrencyFromOfficial($currencyRate);
@@ -173,18 +168,18 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
     }
 
     if ($updatedCurrencyRates) {
-      $this->em->flush($updatedCurrencyRates);
+      $em->flush($updatedCurrencyRates);
     }
 
     return $updatedCurrencyRates;
   }
 
   /**
-   * @param CurrencyRate $currencyRate
+   * @param \Weasty\Money\Currency\Rate\UpdatableFromOfficialCurrencyRateInterface $currencyRate
    * @return bool
    * @throws \Exception
    */
-  public function updateCurrencyFromOfficial(CurrencyRate $currencyRate)
+  public function updateCurrencyFromOfficial(UpdatableFromOfficialCurrencyRateInterface $currencyRate)
   {
 
     if (!$currencyRate->isUpdatableFromOfficial()) {
@@ -198,15 +193,15 @@ class CurrencyRateManager implements CurrencyRateManagerInterface
       ]
     );
 
-    if (!$officialCurrency instanceof OfficialCurrencyRate) {
+    if (!$officialCurrency instanceof OfficialCurrencyRateInterface) {
       throw new \Exception("Official currency rate not found[{$currencyRate->getSourceAlphabeticCode()}]");
     }
 
     switch ($currencyRate->getOfficialOffsetType()) {
-      case CurrencyRate::OFFICIAL_OFFSET_TYPE_PERCENT:
+      case UpdatableFromOfficialCurrencyRateInterface::OFFICIAL_OFFSET_TYPE_PERCENT:
         $newRate = $officialCurrency->getRate() * ((100 + $currencyRate->getOfficialOffsetPercent()) / 100);
         break;
-      case CurrencyRate::OFFICIAL_OFFSET_TYPE_VALUE:
+      case UpdatableFromOfficialCurrencyRateInterface::OFFICIAL_OFFSET_TYPE_VALUE:
         $newRate = $officialCurrency->getRate() + $currencyRate->getOfficialOffsetValue();
         break;
       default:

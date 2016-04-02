@@ -3,7 +3,8 @@ namespace Weasty\Money\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Weasty\Doctrine\Entity\AbstractRepository;
-use Weasty\Money\Currency\Rate\CurrencyRateInterface;
+use Weasty\Doctrine\Entity\EntityInterface;
+use Weasty\Money\Currency\Rate\OfficialCurrencyRateInterface;
 use Weasty\Money\Entity\OfficialCurrencyRate;
 use Weasty\Money\Loader\Exception\RecordsNotFoundException;
 use Weasty\Money\Loader\LoaderFactoryInterface;
@@ -67,12 +68,12 @@ class OfficialCurrencyRateManager implements OfficialCurrencyRateManagerInterfac
     }
 
     /**
-     * @var OfficialCurrencyRate[] $officialCurrencyRates
-     * @var OfficialCurrencyRate[] $officialCurrencyRatesIndexedByCode
+     * @var OfficialCurrencyRateInterface[]|EntityInterface[] $officialCurrencyRates
+     * @var OfficialCurrencyRateInterface[]|EntityInterface[] $officialCurrencyRatesIndexedByCode
      */
     $officialCurrencyRates = $this->officialCurrencyRateRepository->findAll();
     $officialCurrencyRatesIndexedByCode = array_combine(
-      array_map(function (CurrencyRateInterface $currencyRate) {
+      array_map(function (OfficialCurrencyRateInterface $currencyRate) {
         return $currencyRate->getSourceAlphabeticCode();
       }, $officialCurrencyRates),
       $officialCurrencyRates
@@ -83,9 +84,7 @@ class OfficialCurrencyRateManager implements OfficialCurrencyRateManagerInterfac
     foreach ($records as $record) {
 
       if (!empty($officialCurrencyRatesIndexedByCode[$record->getSourceAlphabeticCode()])) {
-        $this->currencyRateMapper->setEntity(
-          $officialCurrencyRatesIndexedByCode[$record->getSourceAlphabeticCode()]
-        );
+        $this->currencyRateMapper->setEntity( $officialCurrencyRatesIndexedByCode[$record->getSourceAlphabeticCode()] );
       } else {
         /**
          * @var $officialCurrencyRate OfficialCurrencyRate

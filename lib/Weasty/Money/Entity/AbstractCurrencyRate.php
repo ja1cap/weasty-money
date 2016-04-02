@@ -254,7 +254,7 @@ class AbstractCurrencyRate extends AbstractEntity implements CurrencyRateInterfa
   {
     return [
         'id' => $this->getId(),
-        'sourceCurrencyAlphabeticCode' => $this->getSourceAlphabeticCode(),
+        'sourceAlphabeticCode' => $this->getSourceAlphabeticCode(),
         'sourceNumericCode' => $this->getSourceNumericCode(),
         'destinationAlphabeticCode' => $this->getDestinationAlphabeticCode(),
         'destinationNumericCode' => $this->getDestinationAlphabeticCode(),
