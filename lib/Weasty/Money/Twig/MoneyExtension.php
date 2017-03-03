@@ -16,8 +16,8 @@ class MoneyExtension extends AbstractMoneyExtension
     public function getFilters()
     {
         return array(
-            new \Twig_SimpleFilter('weasty_price', array($this->getMoneyFormatter(), 'formatPrice'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFilter('weasty_money', array($this->getMoneyFormatter(), 'formatMoney'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('weasty_price', array($this, 'formatPrice'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('weasty_money', array($this, 'formatMoney'), array('is_safe' => array('html'))),
         );
     }
 

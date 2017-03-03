@@ -82,6 +82,8 @@ class BYRLoader implements LoaderInterface {
       )
     );
 
+    $currencyRecords[] = new Record( 'BYN', self::DESTINATION_CURRENCY_CODE, 10000 );
+
     return $currencyRecords;
 
   }

@@ -100,6 +100,12 @@ class CurrencyConverter implements CurrencyConverterInterface {
             'destinationAlphabeticCode' => $destinationCurrencyAlphabeticCode,
         ));
 
+        if ($sourceCurrencyAlphabeticCode == 'BYR' && $destinationCurrencyAlphabeticCode == 'BYN') {
+            return $value / 10000;
+        } elseif ($sourceCurrencyAlphabeticCode == 'BYN' && $destinationCurrencyAlphabeticCode == 'BYR') {
+            return $value * 10000;
+        }
+
         if($currencyRate instanceof CurrencyRateInterface){
             $value = ($value * $currencyRate->getRate());
         }

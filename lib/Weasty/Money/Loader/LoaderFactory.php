@@ -1,6 +1,8 @@
 <?php
 namespace Weasty\Money\Loader;
+use Weasty\Money\Loader\BYN\BYNLoader;
 use Weasty\Money\Loader\BYR\BYRLoader;
+use Weasty\Money\Loader\RUB\RUBLoader;
 
 /**
  * Class LoaderFactory
@@ -17,13 +19,19 @@ class LoaderFactory implements LoaderFactoryInterface{
   public function create( $currencyCode ) {
     switch ( $currencyCode ) {
       case 'BYR':
-        $parser = new BYRLoader();
+        $loader = new BYRLoader();
+        break;
+      case 'BYN':
+        $loader = new BYNLoader();
+        break;
+      case 'RUB':
+        $loader = new RUBLoader();
         break;
       default:
         throw new LoaderException( "Loader not found for currency[$currencyCode]" );
     }
 
-    return $parser;
+    return $loader;
   }
 
 }
