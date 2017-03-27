@@ -125,17 +125,19 @@ class CurrencyConverter implements CurrencyConverterInterface {
       ]
     );
 
-    if( !$currencyRate ) {
+    if( $currencyRate instanceof CurrencyRateInterface ) {
+      $value = ( $value * $currencyRate->getRate() );
+    }
+    else {
       $currencyRate = $this->getCurrencyRateRepository()->findOneBy(
         [
           'sourceAlphabeticCode'      => $destinationCurrencyAlphabeticCode,
           'destinationAlphabeticCode' => $sourceCurrencyAlphabeticCode,
         ]
       );
-    }
-
-    if( $currencyRate instanceof CurrencyRateInterface ) {
-      $value = ( $value * $currencyRate->getRate() );
+      if( $currencyRate instanceof CurrencyRateInterface ) {
+        $value = ( $value * ( 1 / $currencyRate->getRate() ) );
+      }
     }
 
     return $value;
